@@ -5,9 +5,13 @@ Originally based on code by Eliot Back at http://elliottback.com/wp/hashmap-impl
 Reworked by Pete Warden - http://petewarden.typepad.com/searchbrowser/2010/01/c-hashmap.html
 
 Zaks Wang
+
         1.fix bug that put same key the map value will increase
 
         2.add feature that you can change hash function
+
+        You can chose SIMPLE_HASH RS_HASH JS_HASH PJW_HASH ELF_HASH BKDR_HASH DJB_HASH AP_HASH
+        CRC_HAHS
 
 main.c contains an example that tests the functionality of the hashmap module.
 
