@@ -1,5 +1,7 @@
 /*
  * Generic map implementation.
+ * Zaks Wang fix bug if put same key will increase the map size.
+ * 2013-5-9
  */
 #include "hashmap.h"
 
@@ -7,8 +9,34 @@
 #include <stdio.h>
 #include <string.h>
 
-#define INITIAL_SIZE (256)
 #define MAX_CHAIN_LENGTH (8)
+/*
+ * Zaks Wang add the SGI C++ STL primes
+ * 2013-5-8
+ */
+#define num_primes 28
+static const unsigned long prime_list[num_primes]=
+{
+  53ul,97ul,193ul,389ul,769ul,
+  1543ul,3079ul,6151ul,12289ul,24593ul,
+  49157ul,98317ul,196613ul,393241ul,786433ul,
+  1572869ul,3145739ul,6291469ul,12582917ul,25165843ul,
+  50331653ul,100663319ul,201326611ul,402653189ul,805306457ul,
+  1610612741ul,3221225473ul,4294967291ul
+};
+
+inline unsigned long next_prime(unsigned long n){
+  const unsigned long * first = prime_list;
+  const unsigned long * last = prime_list+(int)num_primes;
+  while(first != last&&*first < n){
+    first++;
+  }
+  if(first==last){
+    return *(last-1); //返回最大素数的
+  }else{
+    return *first;
+  }
+}
 
 /* We need to keep keys and values */
 typedef struct _hashmap_element{
@@ -28,14 +56,15 @@ typedef struct _hashmap_map{
 /*
  * Return an empty hashmap, or NULL on failure.
  */
-map_t hashmap_new() {
+map_t hashmap_new(unsigned long size) {
 	hashmap_map* m = (hashmap_map*) malloc(sizeof(hashmap_map));
 	if(!m) goto err;
-
-	m->data = (hashmap_element*) calloc(INITIAL_SIZE, sizeof(hashmap_element)); //calloc会把数据初始化为0
+    size = next_prime(size);
+    long total = size*sizeof(hashmap_element);
+	m->data = (hashmap_element*) calloc(size, sizeof(hashmap_element)); //calloc会把数据初始化为0
 	if(!m->data) goto err;
 
-	m->table_size = INITIAL_SIZE;
+	m->table_size = size;
 	m->size = 0;
 
 	return m;
@@ -273,7 +302,13 @@ int hashmap_put(map_t in, char* key, any_t value){
 		}
 		index = hashmap_hash(in, key);
 	}
-
+    /*
+     * bug fixed by Zaks Wang
+     * 当插入同样的key时候，返回,map size不增加
+     */
+    if(m->data[index].in_use==1){
+      return MAP_USED;
+    }
 	/* Set the data */
 	m->data[index].data = value;
 	m->data[index].key = key;
