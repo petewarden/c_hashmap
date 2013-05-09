@@ -1,6 +1,7 @@
 /*
  * Generic map implementation.
  * Zaks Wang fix bug if put same key will increase the map size.
+ * Add SGI STL primes
  * 2013-5-9
  */
 #include "hashmap.h"
