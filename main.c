@@ -26,7 +26,7 @@ int main(char* argv, int argc)
     char key_string[KEY_MAX_LENGTH];
     data_struct_t* value;
 
-    mymap = hashmap_new(104977777ul);
+    mymap = hashmap_new(2000000ul);
 
     /* First, populate the hash map with ascending values */
     for (index=0; index<KEY_COUNT; index+=1)
