@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#define HASHFUN BKDR_hash
+unsigned int (*hash_fun)(char *keystring);
 
 #define MAX_CHAIN_LENGTH (8)
 /*
@@ -59,9 +61,10 @@ typedef struct _hashmap_map{
  */
 map_t hashmap_new(unsigned long size) {
 	hashmap_map* m = (hashmap_map*) malloc(sizeof(hashmap_map));
+    hash_fun=HASHFUN; //设置hash函数
 	if(!m) goto err;
     size = next_prime(size);
-    long total = size*sizeof(hashmap_element);
+    //long total = size*sizeof(hashmap_element);
 	m->data = (hashmap_element*) calloc(size, sizeof(hashmap_element)); //calloc会把数据初始化为0
 	if(!m->data) goto err;
 
@@ -190,6 +193,13 @@ unsigned long crc32(const unsigned char *s, unsigned int len)
     }
   return crc32val;
 }
+/*
+ * 可以自定义hansh函数
+ */
+unsigned int hashmap_hash_int_diff(hashmap_map *m,char*keystring){
+  unsigned int key = hash_fun(keystring);
+  return key%m->table_size;
+}
 
 /*
  * Hashing function for a string
@@ -229,7 +239,7 @@ int hashmap_hash(map_t in, char* key){
 	if(m->size >= (m->table_size/2)) return MAP_FULL;
 
 	/* Find the best index */
-	curr = hashmap_hash_int(m, key);
+	curr = hashmap_hash_int_diff(m, key);
 
 	/* Linear probing */
 	for(i = 0; i< MAX_CHAIN_LENGTH; i++){
@@ -332,7 +342,7 @@ int hashmap_get(map_t in, char* key, any_t *arg){
 	m = (hashmap_map *) in;
 
 	/* Find data location */
-	curr = hashmap_hash_int(m, key);
+	curr = hashmap_hash_int_diff(m, key);
 
 	/* Linear probing, if necessary */
 	for(i = 0; i<MAX_CHAIN_LENGTH; i++){
@@ -394,7 +404,7 @@ int hashmap_remove(map_t in, char* key){
 	m = (hashmap_map *) in;
 
 	/* Find key */
-	curr = hashmap_hash_int(m, key);
+	curr = hashmap_hash_int_diff(m, key);
 
 	/* Linear probing, if necessary */
 	for(i = 0; i<MAX_CHAIN_LENGTH; i++){

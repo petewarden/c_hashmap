@@ -14,6 +14,7 @@
 #define MAP_OMEM -1 	/* Out of Memory */
 #define MAP_OK 0 	/* OK */
 #define MAP_USED -4 /* 被占用 */
+#include "hash.h"
 
 /*
  * any_t is a pointer.  This allows you to put arbitrary structures in
