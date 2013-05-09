@@ -1,0 +1,46 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+INITIAL_SIZE	hashmap.c	10;"	d	file:
+KEY_COUNT	main.c	13;"	d	file:
+KEY_MAX_LENGTH	main.c	11;"	d	file:
+KEY_PREFIX	main.c	12;"	d	file:
+MAP_FULL	hashmap.h	13;"	d
+MAP_MISSING	hashmap.h	12;"	d
+MAP_OK	hashmap.h	15;"	d
+MAP_OMEM	hashmap.h	14;"	d
+MAX_CHAIN_LENGTH	hashmap.c	11;"	d	file:
+PFany	hashmap.h	/^typedef int (*PFany)(any_t, any_t);$/;"	t
+__HASHMAP_H__	hashmap.h	10;"	d
+_hashmap_element	hashmap.c	/^typedef struct _hashmap_element{$/;"	s	file:
+_hashmap_map	hashmap.c	/^typedef struct _hashmap_map{$/;"	s	file:
+any_t	hashmap.h	/^typedef void *any_t;$/;"	t
+crc32	hashmap.c	/^unsigned long crc32(const unsigned char *s, unsigned int len)$/;"	f
+crc32_tab	hashmap.c	/^static unsigned long crc32_tab[] = {$/;"	v	file:
+data	hashmap.c	/^	any_t data;$/;"	m	struct:_hashmap_element	file:
+data	hashmap.c	/^	hashmap_element *data;$/;"	m	struct:_hashmap_map	file:
+data_struct_s	main.c	/^typedef struct data_struct_s$/;"	s	file:
+data_struct_t	main.c	/^} data_struct_t;$/;"	t	typeref:struct:data_struct_s	file:
+hashmap_element	hashmap.c	/^} hashmap_element;$/;"	t	typeref:struct:_hashmap_element	file:
+hashmap_free	hashmap.c	/^void hashmap_free(map_t in){$/;"	f
+hashmap_get	hashmap.c	/^int hashmap_get(map_t in, char* key, any_t *arg){$/;"	f
+hashmap_hash	hashmap.c	/^int hashmap_hash(map_t in, char* key){$/;"	f
+hashmap_hash_int	hashmap.c	/^unsigned int hashmap_hash_int(hashmap_map * m, char* keystring){$/;"	f
+hashmap_iterate	hashmap.c	/^int hashmap_iterate(map_t in, PFany f, any_t item) {$/;"	f
+hashmap_length	hashmap.c	/^int hashmap_length(map_t in){$/;"	f
+hashmap_map	hashmap.c	/^} hashmap_map;$/;"	t	typeref:struct:_hashmap_map	file:
+hashmap_new	hashmap.c	/^map_t hashmap_new() {$/;"	f
+hashmap_put	hashmap.c	/^int hashmap_put(map_t in, char* key, any_t value){$/;"	f
+hashmap_rehash	hashmap.c	/^int hashmap_rehash(map_t in){$/;"	f
+hashmap_remove	hashmap.c	/^int hashmap_remove(map_t in, char* key){$/;"	f
+in_use	hashmap.c	/^	int in_use;$/;"	m	struct:_hashmap_element	file:
+key	hashmap.c	/^	char* key;$/;"	m	struct:_hashmap_element	file:
+key_string	main.c	/^    char key_string[KEY_MAX_LENGTH];$/;"	m	struct:data_struct_s	file:
+main	main.c	/^int main(char* argv, int argc)$/;"	f
+map_t	hashmap.h	/^typedef any_t map_t;$/;"	t
+number	main.c	/^    int number;$/;"	m	struct:data_struct_s	file:
+size	hashmap.c	/^	int size;$/;"	m	struct:_hashmap_map	file:
+table_size	hashmap.c	/^	int table_size;$/;"	m	struct:_hashmap_map	file:

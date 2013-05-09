@@ -32,7 +32,7 @@ map_t hashmap_new() {
 	hashmap_map* m = (hashmap_map*) malloc(sizeof(hashmap_map));
 	if(!m) goto err;
 
-	m->data = (hashmap_element*) calloc(INITIAL_SIZE, sizeof(hashmap_element));
+	m->data = (hashmap_element*) calloc(INITIAL_SIZE, sizeof(hashmap_element)); //calloc会把数据初始化为0
 	if(!m->data) goto err;
 
 	m->table_size = INITIAL_SIZE;
@@ -150,7 +150,7 @@ unsigned long crc32(const unsigned char *s, unsigned int len)
 {
   unsigned int i;
   unsigned long crc32val;
-  
+
   crc32val = 0;
   for (i = 0;  i < len;  i ++)
     {
@@ -244,7 +244,7 @@ int hashmap_rehash(map_t in){
 
         if (curr[i].in_use == 0)
             continue;
-            
+
 		status = hashmap_put(m, curr[i].key, curr[i].data);
 		if (status != MAP_OK)
 			return status;
@@ -278,7 +278,7 @@ int hashmap_put(map_t in, char* key, any_t value){
 	m->data[index].data = value;
 	m->data[index].key = key;
 	m->data[index].in_use = 1;
-	m->size++; 
+	m->size++;
 
 	return MAP_OK;
 }
@@ -330,7 +330,7 @@ int hashmap_iterate(map_t in, PFany f, any_t item) {
 
 	/* On empty hashmap, return immediately */
 	if (hashmap_length(m) <= 0)
-		return MAP_MISSING;	
+		return MAP_MISSING;
 
 	/* Linear probing */
 	for(i = 0; i< m->table_size; i++)

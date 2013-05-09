@@ -8,3 +8,7 @@ To compile it, run something like this on your system:
 gcc main.c hashmap.c -o hashmaptest
 
 There are no restrictions on how you reuse this code.
+
+hash_func_test
+
+一个字符串hash函数的评测,原文http://blog.csdn.net/liuben/article/details/5050697
