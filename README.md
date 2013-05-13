@@ -25,6 +25,9 @@ hash_func_test
 ##############
 
         一个字符串hash函数的评测,原文http://blog.csdn.net/liuben/article/details/5050697
+        实际语料测试结果，BKDR_HASH远远高于其他HASH函数，其次是AP_HASH
+        如果冲突，建议将MAX_CHAIN_LENGTH设置稍大
+
 hashMap
 #######
 
