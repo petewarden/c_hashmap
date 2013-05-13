@@ -34,3 +34,6 @@ hashMap
         cheungmine修改版hashmap http://blog.csdn.net/cheungmine/article/details/7704686
 
 
+待解决的问题：
+        仅仅一个数组保存pair的指针，当分配8亿多长度的数组时候，内存会不够，可以分为多段数组，
+        再用一个hash解决在多个数组间跳跃问题。有时间再改!
