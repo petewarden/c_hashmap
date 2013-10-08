@@ -18,14 +18,14 @@ typedef struct data_struct_s
     int number;
 } data_struct_t;
 
-int main(char* argv, int argc)
+int main(int argc, char **argv)
 {
     int index;
     int error;
     map_t mymap;
     char key_string[KEY_MAX_LENGTH];
     data_struct_t* value;
-    
+
     mymap = hashmap_new();
 
     /* First, populate the hash map with ascending values */
@@ -46,17 +46,17 @@ int main(char* argv, int argc)
         snprintf(key_string, KEY_MAX_LENGTH, "%s%d", KEY_PREFIX, index);
 
         error = hashmap_get(mymap, key_string, (void**)(&value));
-        
+
         /* Make sure the value was both found and the correct number */
         assert(error==MAP_OK);
         assert(value->number==index);
     }
-    
+
     /* Make sure that a value that wasn't in the map can't be found */
     snprintf(key_string, KEY_MAX_LENGTH, "%s%d", KEY_PREFIX, KEY_COUNT);
 
     error = hashmap_get(mymap, key_string, (void**)(&value));
-        
+
     /* Make sure the value was not found */
     assert(error==MAP_MISSING);
 
@@ -71,9 +71,9 @@ int main(char* argv, int argc)
         error = hashmap_remove(mymap, key_string);
         assert(error==MAP_OK);
 
-        free(value);        
+        free(value);
     }
-    
+
     /* Now, destroy the map */
     hashmap_free(mymap);
 
