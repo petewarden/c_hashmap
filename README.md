@@ -5,5 +5,3 @@ main.c contains an example that tests the functionality of the hashmap module.
 To compile it, run something like this on your system:
 gcc main.c hashmap.c -o hashmaptest
 
-There are no restrictions on how you reuse this code.
-test
