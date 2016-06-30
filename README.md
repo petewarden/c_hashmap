@@ -4,4 +4,4 @@ Reworked by Pete Warden - http://petewarden.typepad.com/searchbrowser/2010/01/c-
 main.c contains an example that tests the functionality of the hashmap module.
 To compile it, run something like this on your system:
 gcc main.c hashmap.c -o hashmaptest
-test6
+test8
