@@ -1,14 +1,45 @@
 /*
  * Generic map implementation.
+ * Zaks Wang fix bug if put same key will increase the map size.
+ * Add SGI STL primes
+ * 2013-5-9
  */
 #include "hashmap.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#define HASHFUN BKDR_hash
+unsigned int (*hash_fun)(char *keystring);
 
-#define INITIAL_SIZE (256)
 #define MAX_CHAIN_LENGTH (8)
+/*
+ * Zaks Wang add the SGI C++ STL primes
+ * 2013-5-8
+ */
+#define num_primes 28
+static const unsigned long prime_list[num_primes]=
+{
+  53ul,97ul,193ul,389ul,769ul,
+  1543ul,3079ul,6151ul,12289ul,24593ul,
+  49157ul,98317ul,196613ul,393241ul,786433ul,
+  1572869ul,3145739ul,6291469ul,12582917ul,25165843ul,
+  50331653ul,100663319ul,201326611ul,402653189ul,805306457ul,
+  1610612741ul,3221225473ul,4294967291ul
+};
+
+inline unsigned long next_prime(unsigned long n){
+  const unsigned long * first = prime_list;
+  const unsigned long * last = prime_list+(int)num_primes;
+  while(first != last&&*first <= n){
+    first++; //获取一个比输入大的质数
+  }
+  if(first==last){
+    return *(last-1); //返回最大素数的
+  }else{
+    return *first;
+  }
+}
 
 /* We need to keep keys and values */
 typedef struct _hashmap_element{
@@ -28,14 +59,16 @@ typedef struct _hashmap_map{
 /*
  * Return an empty hashmap, or NULL on failure.
  */
-map_t hashmap_new() {
+map_t hashmap_new(unsigned long size) {
 	hashmap_map* m = (hashmap_map*) malloc(sizeof(hashmap_map));
+    hash_fun=HASHFUN; //设置hash函数
 	if(!m) goto err;
-
-	m->data = (hashmap_element*) calloc(INITIAL_SIZE, sizeof(hashmap_element));
+    size = next_prime(size);
+    //long total = size*sizeof(hashmap_element);
+	m->data = (hashmap_element*) calloc(size, sizeof(hashmap_element)); //calloc会把数据初始化为0
 	if(!m->data) goto err;
 
-	m->table_size = INITIAL_SIZE;
+	m->table_size = size;
 	m->size = 0;
 
 	return m;
@@ -150,7 +183,7 @@ unsigned long crc32(const unsigned char *s, unsigned int len)
 {
   unsigned int i;
   unsigned long crc32val;
-  
+
   crc32val = 0;
   for (i = 0;  i < len;  i ++)
     {
@@ -159,6 +192,13 @@ unsigned long crc32(const unsigned char *s, unsigned int len)
 	  (crc32val >> 8);
     }
   return crc32val;
+}
+/*
+ * 可以自定义hansh函数
+ */
+unsigned int hashmap_hash_int_diff(hashmap_map *m,char*keystring){
+  unsigned int key = hash_fun(keystring);
+  return key%m->table_size;
 }
 
 /*
@@ -199,7 +239,7 @@ int hashmap_hash(map_t in, char* key){
 	if(m->size >= (m->table_size/2)) return MAP_FULL;
 
 	/* Find the best index */
-	curr = hashmap_hash_int(m, key);
+	curr = hashmap_hash_int_diff(m, key);
 
 	/* Linear probing */
 	for(i = 0; i< MAX_CHAIN_LENGTH; i++){
@@ -225,8 +265,9 @@ int hashmap_rehash(map_t in){
 
 	/* Setup the new elements */
 	hashmap_map *m = (hashmap_map *) in;
+    unsigned long nextSize = next_prime(m->table_size);
 	hashmap_element* temp = (hashmap_element *)
-		calloc(2 * m->table_size, sizeof(hashmap_element));
+		calloc(nextSize, sizeof(hashmap_element));
 	if(!temp) return MAP_OMEM;
 
 	/* Update the array */
@@ -235,7 +276,7 @@ int hashmap_rehash(map_t in){
 
 	/* Update the size */
 	old_size = m->table_size;
-	m->table_size = 2 * m->table_size;
+	m->table_size = nextSize;
 	m->size = 0;
 
 	/* Rehash the elements */
@@ -244,7 +285,7 @@ int hashmap_rehash(map_t in){
 
         if (curr[i].in_use == 0)
             continue;
-            
+
 		status = hashmap_put(m, curr[i].key, curr[i].data);
 		if (status != MAP_OK)
 			return status;
@@ -273,12 +314,18 @@ int hashmap_put(map_t in, char* key, any_t value){
 		}
 		index = hashmap_hash(in, key);
 	}
-
+    /*
+     * bug fixed by Zaks Wang
+     * 当插入同样的key时候，返回,map size不增加
+     */
+    if(m->data[index].in_use==1){
+      return MAP_USED;
+    }
 	/* Set the data */
 	m->data[index].data = value;
 	m->data[index].key = key;
 	m->data[index].in_use = 1;
-	m->size++; 
+	m->size++;
 
 	return MAP_OK;
 }
@@ -295,7 +342,7 @@ int hashmap_get(map_t in, char* key, any_t *arg){
 	m = (hashmap_map *) in;
 
 	/* Find data location */
-	curr = hashmap_hash_int(m, key);
+	curr = hashmap_hash_int_diff(m, key);
 
 	/* Linear probing, if necessary */
 	for(i = 0; i<MAX_CHAIN_LENGTH; i++){
@@ -330,7 +377,7 @@ int hashmap_iterate(map_t in, PFany f, any_t item) {
 
 	/* On empty hashmap, return immediately */
 	if (hashmap_length(m) <= 0)
-		return MAP_MISSING;	
+		return MAP_MISSING;
 
 	/* Linear probing */
 	for(i = 0; i< m->table_size; i++)
@@ -357,7 +404,7 @@ int hashmap_remove(map_t in, char* key){
 	m = (hashmap_map *) in;
 
 	/* Find key */
-	curr = hashmap_hash_int(m, key);
+	curr = hashmap_hash_int_diff(m, key);
 
 	/* Linear probing, if necessary */
 	for(i = 0; i<MAX_CHAIN_LENGTH; i++){
