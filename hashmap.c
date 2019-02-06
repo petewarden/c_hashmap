@@ -274,11 +274,16 @@ int hashmap_put(map_t in, char* key, any_t value){
 		index = hashmap_hash(in, key);
 	}
 
+	/* Increase size only, when new data is inserted. In case of overwriting */
+	/* selected key do not update size. */
+	if(m->data[index].in_use == 0) {
+		m->size++;
+	}
+
 	/* Set the data */
 	m->data[index].data = value;
 	m->data[index].key = key;
 	m->data[index].in_use = 1;
-	m->size++; 
 
 	return MAP_OK;
 }
@@ -345,6 +350,43 @@ int hashmap_iterate(map_t in, PFany f, any_t item) {
     return MAP_OK;
 }
 
+/* Swaps data between two selected elements of hashmap. */
+void _hashmap_swap_items(hashmap_map *m, int pos1, int pos2){
+	char* tmp_key;
+	int tmp_in_use;
+	any_t tmp_data;
+
+	tmp_key = m->data[pos1].key;
+	tmp_in_use = m->data[pos1].in_use;
+	tmp_data = m->data[pos1].data;
+
+	m->data[pos1].key = m->data[pos2].key;
+	m->data[pos1].in_use = m->data[pos2].in_use;
+	m->data[pos1].data = m->data[pos2].data;
+
+	m->data[pos2].key = tmp_key;
+	m->data[pos2].in_use = tmp_in_use;
+	m->data[pos2].data = tmp_data;
+}
+
+/* After removing element from hash map there can be need to move back */
+/* previously pushed elements - pushed moved forward because key colision. */
+void _hashmap_shift_chain_after_remove(hashmap_map *m, char *key, int pos){
+	unsigned int colliding_hash_val;
+	int next_pos;
+	hashmap_element *next_element;
+
+	next_pos = (pos + 1) % m->table_size;
+	next_element = &m->data[next_pos];
+	while((next_element->in_use == 1)
+		&& (hashmap_hash_int(m, next_element->key) != next_pos)) {
+		_hashmap_swap_items(m, pos, next_pos);
+		pos = next_pos;
+		next_pos = (pos + 1) % m->table_size;
+		next_element = &m->data[next_pos];
+	}
+}
+
 /*
  * Remove an element with that key from the map
  */
@@ -372,6 +414,12 @@ int hashmap_remove(map_t in, char* key){
 
                 /* Reduce the size */
                 m->size--;
+
+                /* Move empty entry to the end of colliding elements chain. */
+                /* Colliding elements chain mean elements, which has been */
+                /* moved/push forward because of keys collision. */
+                _hashmap_shift_chain_after_remove(m, key, curr);
+
                 return MAP_OK;
             }
 		}
