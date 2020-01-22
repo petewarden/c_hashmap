@@ -372,7 +372,6 @@ void _hashmap_swap_items(hashmap_map *m, int pos1, int pos2){
 /* After removing element from hash map there can be need to move back */
 /* previously pushed elements - pushed moved forward because key colision. */
 void _hashmap_shift_chain_after_remove(hashmap_map *m, char *key, int pos){
-	unsigned int colliding_hash_val;
 	int next_pos;
 	hashmap_element *next_element;
 
