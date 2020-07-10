@@ -18,7 +18,7 @@ typedef struct data_struct_s
     int number;
 } data_struct_t;
 
-int main(char* argv, int argc)
+int main(int argc, char* argv[])
 {
     int index;
     int error;
