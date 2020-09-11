@@ -395,3 +395,4 @@ int hashmap_length(map_t in){
 	if(m != NULL) return m->size;
 	else return 0;
 }
+
