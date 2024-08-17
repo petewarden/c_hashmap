@@ -189,7 +189,7 @@ unsigned int hashmap_hash_int(hashmap_map * m, char* keystring){
  * to store the point to the item, or MAP_FULL.
  */
 int hashmap_hash(map_t in, char* key){
-	int curr;
+	int curr, tmp;
 	int i;
 
 	/* Cast the hashmap */
@@ -200,14 +200,20 @@ int hashmap_hash(map_t in, char* key){
 
 	/* Find the best index */
 	curr = hashmap_hash_int(m, key);
+	tmp = curr;
 
 	/* Linear probing */
 	for(i = 0; i< MAX_CHAIN_LENGTH; i++){
-		if(m->data[curr].in_use == 0)
-			return curr;
+		if(m->data[tmp].in_use == 1 && (strcmp(m->data[tmp].key,key)==0))
+			return tmp;
 
-		if(m->data[curr].in_use == 1 && (strcmp(m->data[curr].key,key)==0))
+		tmp = (tmp + 1) % m->table_size;
+	}
+	for (i = 0; i < MAX_CHAIN_LENGTH; i++) {
+		if (m->data[curr].in_use == 0) {
+			m->size++;
 			return curr;
+		}
 
 		curr = (curr + 1) % m->table_size;
 	}
@@ -278,7 +284,6 @@ int hashmap_put(map_t in, char* key, any_t value){
 	m->data[index].data = value;
 	m->data[index].key = key;
 	m->data[index].in_use = 1;
-	m->size++; 
 
 	return MAP_OK;
 }
